@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ensebling Models</title>
+  <meta name="description" content="">
+  <meta name="author" content="Chad Junkermeier">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="libraries/frameworks/revealjs/css/reveal.min.css">
+  <link rel="stylesheet" href="libraries/frameworks/revealjs/css/theme/moon.css" id="theme">
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" id="theme">
+  <!--[if lt IE 9]>
+  <script src="lib/js/html5shiv.js"></script>
+  <![endif]-->  <link rel="stylesheet" href = "assets/css/codefont.css">
+<link rel="stylesheet" href = "assets/css/codemargin.css">
+<link rel="stylesheet" href = "assets/css/outfont.css">
+<link rel="stylesheet" href = "assets/css/outmargin.css">
+<link rel="stylesheet" href = "assets/css/ribbons.css">
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class='' data-state='' id='slide-1'>
+  
+  <style>
+
+.reveal h4 {
+    color: #00BFFF;
+    padding-bottom: 10px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.reveal h3 {
+    color: #00BFFF;
+    padding-bottom: 10px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.reveal h2 {
+    color: #00BFFF;
+    padding-bottom: 10px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.reveal p {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.reveal body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+
+</style>
+
+<h2>Ensebling Models</h2>
+
+<p><br></p>
+
+<p>Using Shiny to test modeling settings</p>
+
+<p><br>
+<br></p>
+
+<p><small> Chad Junkermeier </small></p>
+
+</section>
+<section class='' data-state='' id='slide-2'>
+  <h2>Introduction</h2>
+  <p>In the Courcera Practicle Machine Learning class ensembling of models was discussed briefly, this is where two or more models are used as the input of a new uber-model which will hopefully have the strengths of each of the input models and fewer of the deficits.  When I was trying to figure out how to do ensembling I noticed that with the data, modeling techniques, and settings that I used one of the models had a heavier weighting than the other, even though the other model suppposedly worked better according to other analysis.  This is a test to see if by changing a couple of the settings I can change the weighting so that the other model has the heavier weighting.</p>
+
+</section>
+<section class='codefont outfont' data-state='' id='slide-3'>
+  <h2>Code used to produce plot</h2>
+  <pre><code># Load libaries and data frame
+library(caret)
+library(AppliedPredictiveModeling)
+data(AlzheimerDisease)
+library(gbm)
+library(e1071)
+adData = data.frame(diagnosis,predictors)
+
+# Set seed to seed1 and the 
+set.seed(seed1)
+smaller &lt;- createDataPartition(y=adData$diagnosis, p=pv, list=FALSE)
+SMALLER1.TRAINING &lt;- adData[smaller,]
+SMALLER2.TRAINING &lt;- adData[-smaller,]
+
+modFit1.gbm &lt;- train(diagnosis ~ ., method=&quot;gbm&quot;, data=SMALLER1.TRAINING, verbose=FALSE)
+modFit1.svm &lt;- svm(diagnosis ~ .,data=SMALLER1.TRAINING)
+
+predict2.gbm &lt;- predict(modFit1.gbm, newdata=SMALLER2.TRAINING)
+predict2.svm &lt;- predict(modFit1.svm, newdata=SMALLER2.TRAINING)
+
+predDF &lt;- data.frame(lda=predict2.svm, gbm=predict2.gbm, diagnosis=SMALLER2.TRAINING$diagnosis)
+combModFit &lt;- train(diagnosis ~ ., method=&quot;gbm&quot;, data=predDF, verbose=FALSE)
+
+plot(varImp(combModFit, scale=FALSE),lwd=2,cex=3,col=&quot;red&quot;,cex.axis = 2)
+</code></pre>
+
+</section>
+<section class='' data-state='' id='slide-4'>
+  <h2>Sample Plot</h2>
+  <p>Using the code from the previous slide and setting seed1 = 123, and pv=0.33 produces the variable importance plot shown below. </p>
+
+<p><img src="assets/fig/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"></p>
+
+</section>
+<section class='codefont outfont' data-state='' id='slide-5'>
+  <h2>Goat beat boxing</h2>
+  <p><br></p>
+
+<p><video controls> 
+  <source src=assets/img/Goatbeatbox.mp4 type=video/mp4>
+ /video&gt;</p>
+
+<p><br></p>
+
+</section>
+    </div>
+  </div>
+</body>
+  <script src="libraries/frameworks/revealjs/lib/js/head.min.js"></script>
+  <script src="libraries/frameworks/revealjs/js/reveal.min.js"></script>
+  <script>
+  // Full list of configuration options available here:
+  // https://github.com/hakimel/reveal.js#configuration
+  Reveal.initialize({
+    controls: true,
+    progress: true,
+    history: true,
+    center: false,
+    theme: Reveal.getQueryHash().theme || 'moon', 
+    transition: Reveal.getQueryHash().transition || 'none', 
+    dependencies: [
+    // Cross-browser shim that fully implements classList -
+    // https://github.com/eligrey/classList.js/
+      { src: 'libraries/frameworks/revealjs/lib/js/classList.js', condition: function() { return !document.body.classList;}},
+      // Zoom in and out with Alt+click
+      { src: 'libraries/frameworks/revealjs/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      // Speaker notes
+      { src: 'libraries/frameworks/revealjs/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+      // Remote control your reveal.js presentation using a touch device
+      //{ src: 'libraries/frameworks/revealjs/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+      ]
+  });
+  </script>  <!-- LOAD HIGHLIGHTER JS FILES -->
+<script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- DONE LOADING HIGHLIGHTER JS FILES -->
+ 
+
+</html>
